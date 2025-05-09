@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:///hospital.db
+    restart: unless-stopped
+
+  # Add more services as needed, such as:
+  # - Redis for caching
+  # - PostgreSQL for production database
+  # - Nginx for reverse proxy
+  # - Celery for background tasks 
