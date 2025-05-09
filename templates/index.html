@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center">
+    <h1 class="display-4 mb-4">Welcome to Hospital Management System</h1>
+    {% if not current_user.is_authenticated %}
+    <p class="lead">Please <a href="{{ url_for('login') }}">login</a> to access the system.</p>
+    {% else %}
+    <p class="lead">Welcome back, {{ current_user.username }}!</p>
+    <div class="row mt-5">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">OPD</h5>
+                    <p class="card-text">Manage outpatient department records</p>
+                    <a href="{{ url_for('opd_records') }}" class="btn btn-primary">View Records</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">IPD</h5>
+                    <p class="card-text">Manage inpatient department records</p>
+                    <a href="{{ url_for('ipd_records') }}" class="btn btn-primary">View Records</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">OT</h5>
+                    <p class="card-text">Manage operation theater records</p>
+                    <a href="{{ url_for('ot_records') }}" class="btn btn-primary">View Records</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Delivery</h5>
+                    <p class="card-text">Manage delivery records</p>
+                    <a href="{{ url_for('delivery_records') }}" class="btn btn-primary">View Records</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

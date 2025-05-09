@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Delivery Records</h2>
+    <div class="mb-3">
+        <button type="button" class="btn btn-primary" onclick="location.href='/register_patient'">Register New Patient</button>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDeliveryModal">Add Delivery Record</button>
+    </div>
+
+    <!-- Add Delivery Record Modal -->
+    <div class="modal fade" id="addDeliveryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Delivery Record</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="deliveryForm">
+                        <div class="mb-3">
+                            <label for="patient_id" class="form-label">Patient ID</label>
+                            <input type="text" class="form-control" id="patient_id" name="patient_id" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="delivery_type" class="form-label">Delivery Type</label>
+                            <select class="form-control" id="delivery_type" name="delivery_type" required>
+                                <option value="Normal">Normal</option>
+                                <option value="Cesarean">Cesarean</option>
+                                <option value="Forceps">Forceps</option>
+                                <option value="Vacuum">Vacuum</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="doctor" class="form-label">Doctor</label>
+                            <input type="text" class="form-control" id="doctor" name="doctor" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="baby_gender" class="form-label">Baby Gender</label>
+                            <select class="form-control" id="baby_gender" name="baby_gender" required>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="weight" class="form-label">Baby Weight (kg)</label>
+                            <input type="number" step="0.01" class="form-control" id="weight" name="weight" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-control" id="status" name="status" required>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Complications">Complications</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitDeliveryRecord()">Save Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Records Table -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Patient ID</th>
+                    <th>Delivery Type</th>
+                    <th>Doctor</th>
+                    <th>Baby Gender</th>
+                    <th>Weight (kg)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="deliveryRecordsTable">
+                <!-- Records will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function loadDeliveryRecords() {
+    fetch('/api/delivery')
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('deliveryRecordsTable');
+            tableBody.innerHTML = '';
+            data.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.patient_id}</td>
+                    <td>${record.delivery_type}</td>
+                    <td>${record.doctor}</td>
+                    <td>${record.baby_gender}</td>
+                    <td>${record.weight}</td>
+                    <td>${record.status}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editRecord(${record.id})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteRecord(${record.id})">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        });
+}
+
+function submitDeliveryRecord() {
+    const form = document.getElementById('deliveryForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    fetch('/api/delivery', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert('Record added successfully!');
+            form.reset();
+            bootstrap.Modal.getInstance(document.getElementById('addDeliveryModal')).hide();
+            loadDeliveryRecords();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding record');
+    });
+}
+
+// Load records when page loads
+document.addEventListener('DOMContentLoaded', loadDeliveryRecords);
+</script>
+{% endblock %} 

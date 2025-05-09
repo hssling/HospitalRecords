@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Dashboard</h1>
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">OPD Management</h5>
+                    <p class="card-text">Manage outpatient records and appointments</p>
+                    <a href="{{ url_for('opd_records') }}" class="btn btn-primary">Access OPD</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">IPD Management</h5>
+                    <p class="card-text">Manage inpatient admissions and care</p>
+                    <a href="{{ url_for('ipd_records') }}" class="btn btn-primary">Access IPD</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">OT Management</h5>
+                    <p class="card-text">Schedule and manage operations</p>
+                    <a href="{{ url_for('ot_records') }}" class="btn btn-primary">Access OT</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Delivery Management</h5>
+                    <p class="card-text">Manage maternity and delivery cases</p>
+                    <a href="{{ url_for('delivery_records') }}" class="btn btn-primary">Access Delivery</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

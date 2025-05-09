@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>OPD Records</h2>
+        <div>
+            <a href="{{ url_for('register_patient') }}" class="btn btn-success me-2">Register New Patient</a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOPDModal">
+                Add OPD Record
+            </button>
+        </div>
+    </div>
+
+    <!-- Add OPD Record Modal -->
+    <div class="modal fade" id="addOPDModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add OPD Record</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="opdForm">
+                        <div class="mb-3">
+                            <label for="patient_id" class="form-label">Patient ID</label>
+                            <input type="text" class="form-control" id="patient_id" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <input type="text" class="form-control" id="department" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="doctor" class="form-label">Doctor</label>
+                            <input type="text" class="form-control" id="doctor" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="diagnosis" class="form-label">Diagnosis</label>
+                            <textarea class="form-control" id="diagnosis" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="treatment" class="form-label">Treatment</label>
+                            <textarea class="form-control" id="treatment" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fee" class="form-label">Fee</label>
+                            <input type="number" step="0.01" class="form-control" id="fee" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitOPDRecord()">Save Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Records Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Patient ID</th>
+                            <th>Department</th>
+                            <th>Doctor</th>
+                            <th>Diagnosis</th>
+                            <th>Treatment</th>
+                            <th>Fee</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="opdRecords">
+                        <!-- Records will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadOPDRecords() {
+    fetch('/api/opd')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('opdRecords');
+            tbody.innerHTML = '';
+            data.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.patient_id}</td>
+                    <td>${record.department}</td>
+                    <td>${record.doctor}</td>
+                    <td>${record.diagnosis}</td>
+                    <td>${record.treatment}</td>
+                    <td>${record.fee}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editRecord(${record.id})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteRecord(${record.id})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+function submitOPDRecord() {
+    const formData = {
+        patient_id: document.getElementById('patient_id').value,
+        department: document.getElementById('department').value,
+        doctor: document.getElementById('doctor').value,
+        diagnosis: document.getElementById('diagnosis').value,
+        treatment: document.getElementById('treatment').value,
+        fee: document.getElementById('fee').value
+    };
+
+    fetch('/api/opd', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Record added successfully') {
+            $('#addOPDModal').modal('hide');
+            document.getElementById('opdForm').reset();
+            loadOPDRecords();
+        }
+    });
+}
+
+// Load records when page loads
+document.addEventListener('DOMContentLoaded', loadOPDRecords);
+</script>
+{% endblock %} 
