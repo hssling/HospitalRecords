@@ -5,14 +5,14 @@ from datetime import datetime
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.urandom(24)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hospital.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+hospital_management_system = Flask(__name__)
+hospital_management_system.config['SECRET_KEY'] = os.urandom(24)
+hospital_management_system.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hospital.db'
+hospital_management_system.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+db = SQLAlchemy(hospital_management_system)
 login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager.init_app(hospital_management_system)
 login_manager.login_view = 'login'
 
 # Database Models
@@ -82,15 +82,15 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # Routes
-@app.route('/')
+@hospital_management_system.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/test')
+@hospital_management_system.route('/test')
 def test():
     return "Server is running!"
 
-@app.route('/login', methods=['GET', 'POST'])
+@hospital_management_system.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -103,19 +103,19 @@ def login():
         flash('Invalid username or password')
     return render_template('login.html')
 
-@app.route('/logout')
+@hospital_management_system.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/dashboard')
+@hospital_management_system.route('/dashboard')
 @login_required
 def dashboard():
     return render_template('dashboard.html')
 
 # Patient Registration
-@app.route('/register_patient', methods=['GET', 'POST'])
+@hospital_management_system.route('/register_patient', methods=['GET', 'POST'])
 @login_required
 def register_patient():
     if request.method == 'POST':
@@ -133,28 +133,28 @@ def register_patient():
     return render_template('patient_register.html')
 
 # Department Record Routes
-@app.route('/opd_records')
+@hospital_management_system.route('/opd_records')
 @login_required
 def opd_records():
     return render_template('opd_records.html')
 
-@app.route('/ipd_records')
+@hospital_management_system.route('/ipd_records')
 @login_required
 def ipd_records():
     return render_template('ipd_records.html')
 
-@app.route('/ot_records')
+@hospital_management_system.route('/ot_records')
 @login_required
 def ot_records():
     return render_template('ot_records.html')
 
-@app.route('/delivery_records')
+@hospital_management_system.route('/delivery_records')
 @login_required
 def delivery_records():
     return render_template('delivery_records.html')
 
 # API Routes for Records
-@app.route('/api/opd', methods=['GET', 'POST'])
+@hospital_management_system.route('/api/opd', methods=['GET', 'POST'])
 @login_required
 def opd_records_api():
     if request.method == 'POST':
@@ -183,7 +183,7 @@ def opd_records_api():
         'fee': r.fee
     } for r in records])
 
-@app.route('/api/ipd', methods=['GET', 'POST'])
+@hospital_management_system.route('/api/ipd', methods=['GET', 'POST'])
 @login_required
 def ipd_records_api():
     if request.method == 'POST':
@@ -212,7 +212,7 @@ def ipd_records_api():
         'status': r.status
     } for r in records])
 
-@app.route('/api/ot', methods=['GET', 'POST'])
+@hospital_management_system.route('/api/ot', methods=['GET', 'POST'])
 @login_required
 def ot_records_api():
     if request.method == 'POST':
@@ -244,7 +244,7 @@ def ot_records_api():
         'status': r.status
     } for r in records])
 
-@app.route('/api/delivery', methods=['GET', 'POST'])
+@hospital_management_system.route('/api/delivery', methods=['GET', 'POST'])
 @login_required
 def delivery_records_api():
     if request.method == 'POST':
@@ -275,6 +275,6 @@ def delivery_records_api():
     } for r in records])
 
 if __name__ == '__main__':
-    with app.app_context():
+    with hospital_management_system.app_context():
         db.create_all()
-    app.run(debug=True, host='127.0.0.1', port=5001) 
+    hospital_management_system.run(debug=True, host='127.0.0.1', port=5001) 

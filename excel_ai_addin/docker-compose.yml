@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    environment:
+      - PYTHONPATH=/app
+      - DEBUG=1
+    ports:
+      - "8000:8000"
+    command: python -m excel_ai_addin
+
+  test:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+      - TESTING=1
+    command: python -m unittest discover tests
+
+  lint:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+    command: |
+      sh -c "pip install flake8 black isort &&
+             flake8 excel_ai_addin tests &&
+             black --check excel_ai_addin tests &&
+             isort --check-only excel_ai_addin tests" 
